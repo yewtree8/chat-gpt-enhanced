@@ -1,10 +1,15 @@
 import './normalize.css';
 import './App.css';
-import { useState } from 'react';
-//import axios from 'axios';
+import { useState, useEffect } from 'react';
 
 function App() {
 
+  useEffect(() => {
+    getEngines();
+  }, []);
+
+  const [models, setModels] = useState([]);
+  const [currentModel, setCurrentModel] = useState("text-ada-001");
   const [input, setInput] = useState("");
   const [chatLog, setChatLog] = useState([ {
     user: "gpt",
@@ -21,6 +26,7 @@ function App() {
     setChatLog(chatLogNew);
     await setInput("");
     const messages = chatLogNew.map((message) => message.message).join("\n");
+    console.log("Current model is " + currentModel);
 
     const response = await fetch("http://localhost:3080/", {
       method: "POST",
@@ -28,7 +34,8 @@ function App() {
         "Content-Type" : "application/json",
       },
       body: JSON.stringify({
-        message: messages
+        message: messages,
+        currentModel,
       }),
     });
     const data = await response.json();
@@ -40,12 +47,32 @@ function App() {
     setChatLog([]);
   }
 
+  async function getEngines() {
+    fetch("http://localhost:3080/models")
+    .then(res => res.json())
+    .then(data => setModels(data.models.data));
+  }
+
   return (
     <div className="App">
       <aside className="sidemenu">
           <div className="side-menu-button" onClick={clearChatLog}>
             <span>+</span>
               New Chat
+          </div>
+          <div className="models">
+            <select
+            value={currentModel}
+            onChange={(e) => {
+              console.log(e.target.value);
+              setCurrentModel(e.target.value);
+            }}
+            name="modelSelect">
+            {models.map((model, index) => {
+              return (
+              <option key={model.id} value={model.id}>{model.id}</option>)
+            })}
+            </select>
           </div>
       </aside>
       <section className="chatbox">

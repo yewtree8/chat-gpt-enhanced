@@ -97,6 +97,21 @@
   pointer-events: none;
 }
 
+.models {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.models select {
+  width: 100%;
+  color:#10a37f;
+}
+
+.models option {
+  color: #10a37f;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
